@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <string>
 #include <sstream>
 #include <stdlib.h>
@@ -33,6 +34,8 @@ ConnectThree::ConnectThree(QWidget *parent) :
         connect(this, SIGNAL(addPiece(int,QString)), slot[i], SLOT(maybeAddPiece(int,QString)));
         connect(slot[i], SIGNAL(pieceAdded(int)), this, SLOT(changeTurn(int)));
         slotLayout->addWidget(slot[i]);
+
+        free_spaces[i] = 10;
     }
 
     quitButton = new QPushButton(tr("&Quit"));
@@ -76,10 +79,11 @@ void ConnectThree::changeTurn(int i)
 
 void ConnectThree::enemyTurn()
 {
-    if (free_spaces[0] != 0 && free_spaces[1] != 0 && free_spaces[2] != 0) {
+    if (free_spaces[0] != 0 || free_spaces[1] != 0 || free_spaces[2] != 0) {
         int which_slot = rand() % 3;
-        while(free_spaces[which_slot] == 0)
-            which_slot = rand() %3;
+        while(free_spaces[which_slot] == 0) {
+            which_slot = rand() % 3;
+        }
         emit addPiece(which_slot+1, "Red");
     }
 }
