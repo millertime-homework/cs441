@@ -11,6 +11,7 @@ public:
     ~PieceSlot();
 
 signals:
+    void pieceAdded(int);
 
 public slots:
     void maybeAddPiece(int,QString);

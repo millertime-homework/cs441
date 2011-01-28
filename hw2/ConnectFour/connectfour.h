@@ -12,6 +12,7 @@ class ConnectFour : public QWidget
 
 public slots:
     void selectedSlot(int);
+    void changeTurn(int);
 
 signals:
     void addPiece(int,QString);
@@ -21,10 +22,11 @@ public:
     ~ConnectFour();
 
 private:
-    void changeTurn();
+    void enemyTurn();
     QPushButton *quitButton;
     int num_columns;
     QString whose_turn;
+    int free_spaces[3];
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,7 @@
 #include <string>
 #include <sstream>
+#include <stdlib.h>
+#include <time.h>
 #include "connectfour.h"
 #include "slotbutton.h"
 #include "pieceslot.h"
@@ -9,6 +11,8 @@ using std::string;
 ConnectFour::ConnectFour(QWidget *parent) :
     QWidget(parent),num_columns(3),whose_turn("Black")
 {
+    srand(time(NULL));  //seed my random turn generator
+
     int n = 10;   // number_of_pieces_per_column
 
     SlotButton *slotButton[num_columns];
@@ -27,6 +31,7 @@ ConnectFour::ConnectFour(QWidget *parent) :
 
         slot[i] = new PieceSlot(i+1, n);
         connect(this, SIGNAL(addPiece(int,QString)), slot[i], SLOT(maybeAddPiece(int,QString)));
+        connect(slot[i], SIGNAL(pieceAdded(int)), this, SLOT(changeTurn(int)));
         slotLayout->addWidget(slot[i]);
     }
 
@@ -51,17 +56,30 @@ ConnectFour::~ConnectFour()
     delete quitButton;
 }
 
-//TODO: don't change turn every time there's a click!
 void ConnectFour::selectedSlot(int i)
 {
-    emit addPiece(i, whose_turn);
-    changeTurn();
+    if (whose_turn == "Black")
+        emit addPiece(i, whose_turn);
 }
 
-void ConnectFour::changeTurn()
+void ConnectFour::changeTurn(int i)
 {
-    if (whose_turn == "Black")
+    if (whose_turn == "Black") {
         whose_turn = "Red";
-    else
+        enemyTurn();
+    }
+    else {
         whose_turn = "Black";
+    }
+    --free_spaces[i-1];
+}
+
+void ConnectFour::enemyTurn()
+{
+    if (free_spaces[0] != 0 && free_spaces[1] != 0 && free_spaces[2] != 0) {
+        int which_slot = rand() % 3;
+        while(free_spaces[which_slot] == 0)
+            which_slot = rand() %3;
+        emit addPiece(which_slot+1, "Red");
+    }
 }

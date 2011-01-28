@@ -29,6 +29,7 @@ void PieceSlot::maybeAddPiece(int i, QString color)
         } else {
             position[next_spot--]->setPixmap(QPixmap(":/pictures/red.jpg"));
         }
+        emit pieceAdded(i);
     }
 }
 
