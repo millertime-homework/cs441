@@ -20,3 +20,6 @@ HEADERS  += connectfour.h \
     pieceslot.h
 
 FORMS    +=
+
+RESOURCES += \
+    connectfour.qrc

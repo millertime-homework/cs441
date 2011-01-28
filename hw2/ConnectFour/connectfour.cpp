@@ -7,9 +7,9 @@
 using std::string;
 
 ConnectFour::ConnectFour(QWidget *parent) :
-    QWidget(parent),num_columns(7)
+    QWidget(parent),num_columns(3)
 {
-    int n = 6;   // number_of_pieces_per_column
+    int n = 10;   // number_of_pieces_per_column
 
     SlotButton *slotButton[num_columns];
     PieceSlot *slot[num_columns];
@@ -48,7 +48,7 @@ ConnectFour::ConnectFour(QWidget *parent) :
 
 ConnectFour::~ConnectFour()
 {
-
+    delete quitButton;
 }
 
 void ConnectFour::selectedSlot(int i)

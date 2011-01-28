@@ -8,6 +8,7 @@ class PieceSlot : public QWidget
     Q_OBJECT
 public:
     PieceSlot(int, int, QWidget *parent = 0);
+    ~PieceSlot();
 
 signals:
 
@@ -19,9 +20,7 @@ private:
     bool full();
     int my_id;
     int num_spaces;
-    //QLabel *position[6];
-    //QLabel *foo;
-
+    QLabel *position[10];
 };
 
 #endif // PIECESLOT_H
