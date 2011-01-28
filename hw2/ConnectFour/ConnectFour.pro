@@ -11,8 +11,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        connectfour.cpp
+        connectfour.cpp \
+    slotbutton.cpp \
+    pieceslot.cpp
 
-HEADERS  += connectfour.h
+HEADERS  += connectfour.h \
+    slotbutton.h \
+    pieceslot.h
 
 FORMS    +=
