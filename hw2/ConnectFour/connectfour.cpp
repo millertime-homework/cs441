@@ -7,7 +7,7 @@
 using std::string;
 
 ConnectFour::ConnectFour(QWidget *parent) :
-    QWidget(parent),num_columns(3)
+    QWidget(parent),num_columns(3),whose_turn("Black")
 {
     int n = 10;   // number_of_pieces_per_column
 
@@ -51,11 +51,17 @@ ConnectFour::~ConnectFour()
     delete quitButton;
 }
 
+//TODO: don't change turn every time there's a click!
 void ConnectFour::selectedSlot(int i)
 {
-    /*std::stringstream nstream;
-    nstream << i;
-    string message = "You clicked on " + nstream.str();
-    QMessageBox::information(this, tr("Clicked"), tr(message.c_str()));*/
-    emit addPiece(i, "Black");
+    emit addPiece(i, whose_turn);
+    changeTurn();
+}
+
+void ConnectFour::changeTurn()
+{
+    if (whose_turn == "Black")
+        whose_turn = "Red";
+    else
+        whose_turn = "Black";
 }

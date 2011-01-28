@@ -16,10 +16,10 @@ public slots:
     void maybeAddPiece(int,QString);
 
 private:
-    void addPiece(QString);
     bool full();
     int my_id;
     int num_spaces;
+    int next_spot;
     QLabel *position[10];
 };
 

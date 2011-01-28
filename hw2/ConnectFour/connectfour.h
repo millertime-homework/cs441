@@ -21,9 +21,10 @@ public:
     ~ConnectFour();
 
 private:
+    void changeTurn();
     QPushButton *quitButton;
     int num_columns;
-
+    QString whose_turn;
 };
 
 #endif // MAINWINDOW_H
