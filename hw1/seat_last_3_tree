@@ -1,0 +1,19 @@
+This is what the trees look like that I drew to enumerate best seats for the last 3 people I seat.
+There are 3 empty seats left [s1,s2,s3] and 3 unsat people [p1,p2,p3]
+P1 first tries sitting in s1 and seeing what the 2 possible configurations look like, 
+then in the second and third tree p1 has tried the other seats.
+
+
+                             (s1,p1)
+                            /       \
+      (s1,p1),(s2,p2),(s3,p3)       (s1,p1),(s2,p3),(s3,p2)
+
+
+                             (s2,p1)
+                            /       \
+      (s2,p1),(s1,p2),(s3,p3)       (s2,p1),(s1,p3),(s3,p2)
+
+
+                             (s3,p1)
+                            /       \
+      (s3,p1),(s1,p2),(s2,p3)       (s3,p1),(s1,p3),(s2,p2)

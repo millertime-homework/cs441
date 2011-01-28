@@ -1,0 +1,42 @@
+This is another idea I've got for trying to seat people much better. It should be a lot slower, though.
+I'll call it the down-the-rows subalgorithm
+
+- Seat one person in the first seat.
+  Pick the estimated "least friendly person" via highest preference sum.
+  current score = 0
+
+- Seat everyone else, one at a time.
+  e.g. For person 2.. seat across from person 1.
+       Select the person who is "most compatible" with person 1, thus increasing total score most.
+       current score = (1,2)
+       where (x,y) is the total relationship points for person x and y
+
+       Then move across the top and bottom row together.
+       Now need to also consider the cross-relationship.
+       So for person 3 and 4.. the seating will be:
+       1 3
+       2 4
+       current score = (1,2)+(1,3)+(2,4)+(3,4)
+
+- Continue in this manner, filling one seat at a time with the person who raises the score the most.
+
+function seat_guests
+people = List(sort_by=friendliness)
+put_in_seat(seat_number(1), people[0])
+best_friend = find_best_friend(people[0])
+put_in_seat(seat_number((n/2)+1), best_friend)
+for i in range(2,n/2):
+    best_friends = find_best_pair(people[0],person_at_seat(i-1))
+    # where best_friends is (top,bottom)
+    put_in_seat(seat_number(i),best_friends[0])
+    put_in_seat(seat_number(i+(n/2)),best_friends[1])
+
+function find_best_friend(person)
+best_friend = (0,0)  # (person,score)
+for p in unsat_people:
+    like = lookup_likeness(person,p)
+    if mixed_gender(person,p):
+       like += 1
+    if like > best_friend[1]:
+       best_friend = (p,like)
+return best_friend[0]

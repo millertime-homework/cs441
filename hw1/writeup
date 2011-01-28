@@ -1,0 +1,212 @@
+DinnerParty - WriteUp
+CS441
+Jan 18 2011
+Russell Miller
+millerr@cs.pdx.edu
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+How the code works
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Please see below in my Coding Journal to see the incremental changes I made to my algorithms. 
+Also, a git log is attached.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+How to build
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+I wrote this program in Python which does not need to be compiled.
+Simply type "./dinnerparty.py [filename]" to run it.
+       [filename] is one of the provided instances:
+       hw1-inst1.txt, hw1-inst2.txt, hw1-inst3.txt
+The output file will be generated when the program completes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+How it did
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+I've been watching the scores people post online, and I've seen higher scores than what I got, but at times
+I've been able to keep up reasonably. I don't have a way to verify their scores, so I'm happy with what I've
+got. You should expect to see a score of 92, 154, and 117 respectively for each input file. Most of the time
+that I worked on this assignment I could get my scores in less than a second, but in the end they take
+.5, 15, and 21 seconds respectively. This was calculated with the Linux shell command "time".
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+My Specs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The times listed above were achieved when running my program on my laptop.
+Compaq Mini 110
+1.6GHz Processor
+1GB RAM
+Arch Linux 2.6.36-ARCH #1 SMP PREEMPT i686 Intel(R) Atom(TM) CPU N270 @ 1.60GHz GenuineIntel GNU/Linux
+Python 2.7.1
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Coding Journal
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Thu Jan 13 12:06:13 PST 2011
+    Thinking up some heuristics.. Sum of each person's preference table row?
+Seems to be a good heuristic to get started with. Tried just sitting people in order of their prefsum, and
+had positive numbers next to each other, negative numbers next to each other. Low number seems to mean that
+there is higher probability of sitting next to someone that will detract from the total score. Ended up with
+a lower score than with original random seating. Original was -15, this was -38.
+    Instead sat them every other seat. This split the detrimental personalities from each other, creating a
+checkerboard, basically starting from the lowest score and skipping every other seat. This ended up giving me
+my first positive score of 18.
+    Working on writing the code to store everyone's total preference value. Ordering those values into a list
+and one by one going to seat them.
+    Got the function working that counts the total preference for each person. Tried seating every other seat
+and then even stopped before the last 3 people. I implemented an actual search for those last 3 that put them
+in the seats where the total difference of score would be greatest, by checking every combination of people
+and seats. For the first example, using the beginning estimate of seating every other chair, in order of
+preference sums, the people were in the same spot. So in the end the score was still only 18. I didn't even
+try it on the other two input files.
+
+Sun Jan 16 22:30:16 PST 2011
+    Instead, I went back to the drawing board, literally. I thought of a new strategy. If I could seat 2 people
+at a time, using a similar strategy to "seat_last_3", perhaps the end result would be slightly better. I had
+some different ideas after a while. First I was going to start from the middle of the table with the
+"friendliest" person. This seemed complicated for filling the rest of the seats, so instead I modified that idea
+and started at the first seat, with the "least friendly" person. From there I found their "best friend".
+Out of all the other people, whoever had the most compatible preference value both ways, combined with the
+possible gender bonus, would sit across from them. Then, by adding a new person to the top row and a new person
+to the bottom, and checking the new relationships that could potentially exist, found the best pair of people
+possible. Fortunately, the preference sum estimate was useful and I didn't get backed in to a corner. For the
+first input file, I got a new record of 88 points! This compares to a 112 I've seen on the class forum. There
+is more tweaking I'd like to do. Comparing to the only posted score of 470 for input file number 2, I got a
+score of 514! The only posted score for file number 3 was 133, and I got a 78. It would be great if future
+modifications could increase all of those numbers.
+
+Tue Jan 18 01:28:33 PST 2011
+    Another bit of good news! My wish came true and I was able to improve my scores. All I did was take the
+seating I had and look for ways to swap seats until I had the best score. At this point, each of the layouts
+I've got is at its optimal value for a single seat swap. Now it would take multiple swaps to improve the score.
+For that to happen I think I need to broaden the scope more. My original method of finding where to seat people
+seems too sloppy. Perhaps I will try to improve it even more. We are kind of running out of time, though.
+
+Tue Jan 18 13:45:18 PST 2011
+    Two major modifications today. Before, I was picking someone for the first seat. Now I am giving everyone
+a chance to sit there in the beginning and work from there. It still finds the optimal 2nd person. And it still
+finds the optimal pair of people to add to the table, 2 at a time. Since now I don't do any calculating to seat
+the first person, I don't need the prefsum table anymore. I threw it out, and am a little upset that I didn't
+end up needing it at all. The rest of the process is the same. After picking optimal pairs and filling the table
+I check for single swaps that can improve the overall score. This is a brute-force look at the first seat,
+with some greedy seating, that ends with a brute-force check for any improvements that are possible.
+
+     Things that could be improved, with the cost of taking more time, are to expand the initial brute force
+seating. Rather than only considering the very first seat I could try every combination of first two seats,
+or first three seats. These would increase the time complexity considerably, and given our time constraint
+I am settling with how the code is currently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Git Log
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+commit 5f26a30f2ae976c0b5b98d231387fc254b7efe3b
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 18 13:43:39 2011 -0800
+
+    done now
+
+commit daddb8405ef49260db7c63d9bde9755eac7255b1
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 18 01:31:44 2011 -0800
+
+    added a little to the writeup
+
+commit b4d7c42b5de2017ff1c349280c8eacc6d8e9cd28
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 18 00:07:49 2011 -0800
+
+    Added another step to the process. Now check for any seats that can swap to
+    improve the score. The overall scores for each input have increased.
+    Also, refactored much of the code to now use classes. Made it easier to use
+    helper functions with the data shared rather than passing it around.
+
+commit 7830defb9648a6418f193d9bf442b1dd6d23605a
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Sun Jan 16 22:40:20 2011 -0800
+
+    added to the writeup for the new algorithm
+
+commit 1192b0c4bd1f5be887dc98521ecee58614d5ce2e
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Sun Jan 16 21:46:47 2011 -0800
+
+    The new algorithm works! And it works well! Best score I've seen!
+
+commit 7ea959d4c426f92713ff1bfa7b88b50a40ab39cd
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Sun Jan 16 20:16:37 2011 -0800
+
+    got the design down for this attempt. going to throw code at it
+
+commit a8789f38f61f6d2dc861f3f68b3d094b19fb3251
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Sun Jan 16 02:16:52 2011 -0800
+
+    oh it was just a bug. had an off by one, along with using the wrong index
+
+commit b7d9945d8ddbb4737725d8623af3a488024afb6c
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Sun Jan 16 01:30:21 2011 -0800
+
+    finally completed the seat_last_3 algorithm, but the end score was worse for ex1. did manage to clean up the score calculation and added calculation of individual seats
+
+commit 46c2a24ec0fb681ffdd2254bb574fef96c9714d9
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Thu Jan 13 19:41:08 2011 -0800
+
+    much broken stuff. must fix lots
+
+commit 0249e6333fa79d9f4629d76add5e8023d8e8c9e9
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Thu Jan 13 17:59:58 2011 -0800
+
+    tidying things up
+
+commit 66874d3f24553b3a3d81c7f77dd5caa2a6a00537
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Thu Jan 13 15:01:10 2011 -0800
+
+    trying to model a nice way to seat the last 3 people carefully
+
+commit b4fb4dfb622e0eb46469ead86044b018135387d7
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Thu Jan 13 14:35:59 2011 -0800
+
+    successfully seating in order of most hateful people first
+
+commit 97013558029980db51dff192b8c6882a43f9719b
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Thu Jan 13 14:06:46 2011 -0800
+
+    trying to code in the prefsum seating
+
+commit 4bbc103b24f87fd74aec9b49926c246f57988765
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Thu Jan 13 12:17:41 2011 -0800
+
+    Working on new seating arrangements. New print statement to see what peoples prefsums are.
+
+commit 418be3b70d25ac0ec473db86acced85d70dc18a4
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 11 18:56:13 2011 -0800
+
+    outputs to file successfully
+
+commit ca68db4c6509ce61c55528cdb471a42ef9c8e22c
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 11 18:30:47 2011 -0800
+
+    calculating score correctly, outputting to file
+
+commit 27b6c54746649cf4549d68d148086e74adfa88cd
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 11 11:48:22 2011 -0800
+
+    test case written, trying to evaluate score
+
+commit 8bb027b9e7b5ea4402773661dcf591920630c1b3
+Author: Russell <miller.time.baby@gmail.com>
+Date:   Tue Jan 11 09:17:08 2011 -0800
+
+    Parsed the file. Able to find n and fill out the preference table info
+
