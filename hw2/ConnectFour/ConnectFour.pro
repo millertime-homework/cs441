@@ -11,8 +11,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        connectfour.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += connectfour.h
 
 FORMS    +=
