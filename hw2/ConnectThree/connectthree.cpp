@@ -2,13 +2,13 @@
 #include <sstream>
 #include <stdlib.h>
 #include <time.h>
-#include "connectfour.h"
+#include "connectthree.h"
 #include "slotbutton.h"
 #include "pieceslot.h"
 
 using std::string;
 
-ConnectFour::ConnectFour(QWidget *parent) :
+ConnectThree::ConnectThree(QWidget *parent) :
     QWidget(parent),num_columns(3),whose_turn("Black")
 {
     srand(time(NULL));  //seed my random turn generator
@@ -48,21 +48,21 @@ ConnectFour::ConnectFour(QWidget *parent) :
     mainLayout->addLayout(buttonLayout, 2, 0);
 
     setLayout(mainLayout);
-    setWindowTitle(tr("Connect Four"));
+    setWindowTitle(tr("Connect Three"));
 }
 
-ConnectFour::~ConnectFour()
+ConnectThree::~ConnectThree()
 {
     delete quitButton;
 }
 
-void ConnectFour::selectedSlot(int i)
+void ConnectThree::selectedSlot(int i)
 {
     if (whose_turn == "Black")
         emit addPiece(i, whose_turn);
 }
 
-void ConnectFour::changeTurn(int i)
+void ConnectThree::changeTurn(int i)
 {
     if (whose_turn == "Black") {
         whose_turn = "Red";
@@ -74,7 +74,7 @@ void ConnectFour::changeTurn(int i)
     --free_spaces[i-1];
 }
 
-void ConnectFour::enemyTurn()
+void ConnectThree::enemyTurn()
 {
     if (free_spaces[0] != 0 && free_spaces[1] != 0 && free_spaces[2] != 0) {
         int which_slot = rand() % 3;

@@ -11,15 +11,15 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        connectfour.cpp \
+        connectthree.cpp \
     slotbutton.cpp \
     pieceslot.cpp
 
-HEADERS  += connectfour.h \
+HEADERS  += connectthree.h \
     slotbutton.h \
     pieceslot.h
 
 FORMS    +=
 
 RESOURCES += \
-    connectfour.qrc
+    connectthree.qrc

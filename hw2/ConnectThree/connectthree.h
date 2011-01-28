@@ -1,12 +1,12 @@
-#ifndef CONNECTFOUR_H
-#define CONNECTFOUR_H
+#ifndef CONNECTTHREE_H
+#define CONNECTTHREE_H
 
 #include <QtGui>
 
 class QLabel;
 class QPushButton;
 
-class ConnectFour : public QWidget
+class ConnectThree : public QWidget
 {
     Q_OBJECT
 
@@ -18,8 +18,8 @@ signals:
     void addPiece(int,QString);
 
 public:
-    ConnectFour(QWidget *parent = 0);
-    ~ConnectFour();
+    ConnectThree(QWidget *parent = 0);
+    ~ConnectThree();
 
 private:
     void enemyTurn();

@@ -1,10 +1,10 @@
 #include <QtGui>
-#include "connectfour.h"
+#include "connectthree.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    ConnectFour w;
+    ConnectThree w;
     w.show();
 
     return a.exec();
