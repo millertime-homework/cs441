@@ -1,4 +1,32 @@
-Standard Connect Four--
-7 columns, 6 slots each.
-First player can force a win.
-What color first? Don't know if it matters... duh.
+isWin?
+
+columns[10][3]
+
+across
+------
+b b b
+
+columns[i][0]==columns[i][1]==columns[i][2]
+
+diag1
+-----
+b
+  b
+    b
+
+columns[i+2][0]==columns[i+1][1]==columns[i][0]
+
+diag2
+-----
+    b
+  b
+b
+
+columns[i][0]==columns[i+1][1]==columns[i+2][0]
+
+down
+----
+b
+b
+b
+columns[i][j]==columns[i+1][j]==columns[i+2][j]

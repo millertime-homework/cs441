@@ -16,6 +16,7 @@ public slots:
 
 signals:
     void addPiece(int,QString);
+    void resetSlot(int);
 
 public:
     ConnectThree(QWidget *parent = 0);
@@ -23,10 +24,19 @@ public:
 
 private:
     void enemyTurn();
+    int free_spaces(int);
+    void updateBoardArray(int,QString);
+    void checkForWin();
+    char matchAcross(int);
+    char matchDiagDown(int);
+    char matchDiagUp(int);
+    char matchUpDown(int);
+    void announceWin(char);
+    void resetBoard();
     QPushButton *quitButton;
     int num_columns;
     QString whose_turn;
-    int free_spaces[3];
+    char columns[3][10];
 };
 
 #endif // MAINWINDOW_H

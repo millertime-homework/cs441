@@ -15,6 +15,7 @@ signals:
 
 public slots:
     void maybeAddPiece(int,QString);
+    void resetSlot(int);
 
 private:
     bool full();
