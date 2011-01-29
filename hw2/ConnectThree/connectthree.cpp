@@ -126,7 +126,7 @@ void ConnectThree::printArray()
 
 int ConnectThree::free_spaces(int column)
 {
-    int result;
+    int result = 0;
     int i;
     for(i = 0; i < 10; i++) {
         if (columns[column][i] == '-')
