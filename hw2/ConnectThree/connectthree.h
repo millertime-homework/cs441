@@ -26,13 +26,14 @@ private:
     void enemyTurn();
     int free_spaces(int);
     void updateBoardArray(int,QString);
-    void checkForWin();
+    bool checkForWin();
     char matchAcross(int);
     char matchDiagDown(int);
     char matchDiagUp(int);
     char matchUpDown(int);
     void announceWin(char);
     void resetBoard();
+    void printArray();
     QPushButton *quitButton;
     int num_columns;
     QString whose_turn;

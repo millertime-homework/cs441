@@ -72,6 +72,7 @@ void ConnectThree::resetBoard()
         for(j = 0; j < 10; j++)
             columns[i][j] = '-';
     }
+    whose_turn = "Black";
 }
 
 void ConnectThree::selectedSlot(int i)
@@ -83,7 +84,8 @@ void ConnectThree::selectedSlot(int i)
 void ConnectThree::changeTurn(int i)
 {
     updateBoardArray(i,whose_turn);
-    checkForWin();
+    if (checkForWin())
+        return;
     if (whose_turn == "Black") {
         whose_turn = "Red";
         enemyTurn();
@@ -100,17 +102,26 @@ void ConnectThree::updateBoardArray(int column, QString player)
         p = 'B';
     int i;
     for(i = 0; i < 10; i++) {
-        if (columns[column][i] == '-') {
-            columns[column][i] = p;
+        if (columns[column-1][i] == '-') {
+            columns[column-1][i] = p;
             break;
         }
     }
+    //printArray();
+}
 
-    //QString debugprint;
-    //for(i = 0; i < 10; i++) {
-    //    debugprint += columns[column][i] + " ";
-    //}
-    //qDebug() << debugprint;
+void ConnectThree::printArray()
+{
+    QString slot1, slot2, slot3;
+    int i;
+    for(i = 0; i < 10; i++) {
+        slot1 += columns[0][i];
+        slot2 += columns[1][i];
+        slot3 += columns[2][i];
+    }
+    qDebug() << slot1;
+    qDebug() << slot2;
+    qDebug() << slot3;
 }
 
 int ConnectThree::free_spaces(int column)
@@ -129,16 +140,20 @@ void ConnectThree::enemyTurn()
     if (free_spaces(0) != 0 || free_spaces(1) != 0 || free_spaces(2) != 0) {
         int which_slot = rand() % 3;
         while(free_spaces(which_slot) == 0) {
-            which_slot = rand() % 3;
+            which_slot = ((which_slot+1) % 3);
         }
         emit addPiece(which_slot+1, "Red");
+    } else {
+        QMessageBox::information(this, "Full", "The board is all full!");
+        resetBoard();
     }
 }
 
 char ConnectThree::matchAcross(int row)
 {
-    if (columns[0][row] == columns[1][row] && columns[1][row] == columns[2][row]) {
-        //qDebug() << "matchAcross detected " << columns[row][0] << " on row " << row;
+    if (columns[0][row] != '-' &&
+        ((columns[0][row] == columns[1][row]) &&
+         (columns[1][row] == columns[2][row]))) {
         return columns[0][row];
     }
     else
@@ -149,8 +164,9 @@ char ConnectThree::matchDiagDown(int row)
 {
     if (row > 7)
         return '-';   // avoid an array index error
-    else if (columns[0][row+2] == columns[1][row+1] && columns[1][row+1] == columns[2][row]) {
-        //qDebug() << "matchDiagDown detected " << columns[row+2][0] << " on row " << row;
+    else if (columns[0][row+2] != '-' &&
+             (columns[0][row+2] == columns[1][row+1] &&
+              columns[1][row+1] == columns[2][row])) {
         return columns[0][row+2];
     }
     else
@@ -160,9 +176,10 @@ char ConnectThree::matchDiagDown(int row)
 char ConnectThree::matchDiagUp(int row)
 {
     if (row > 7)
-        return false;   // avoid an array index error
-    else if (columns[0][row] == columns[1][row+1] && columns[1][row+1] == columns[2][row+2]) {
-        //qDebug() << "matchDiagUp detected " << columns[row][0] << " on row " << row;
+        return '-';   // avoid an array index error
+    else if (columns[0][row] != '-' &&
+             (columns[0][row] == columns[1][row+1] &&
+              columns[1][row+1] == columns[2][row+2])) {
         return columns[0][row];
     }
     else
@@ -173,49 +190,44 @@ char ConnectThree::matchUpDown(int row)
 {
     int i;
     for(i = 0; i < 3; i++) {
-        if (columns[i][row] == columns[i][row+1] && columns[i][row+1] == columns[i][row+2]) {
-            //qDebug() << "matchUpDown detected " << columns[row][i] << " on row " << row;
-            //qDebug() << "and column " << i;
+        if (columns[i][row] != '-' &&
+            (columns[i][row] == columns[i][row+1] &&
+             columns[i][row+1] == columns[i][row+2])) {
             return columns[i][row];
         }
     }
     return '-';
 }
 
-void ConnectThree::checkForWin()
+bool ConnectThree::checkForWin()
 {
     int i;
     char r;
     for(i = 0; i < 10; i++) {
         if ((r = matchAcross(i)) != '-') {
-            //qDebug() << "matchAcross thinks " << r << "won.";
             announceWin(r);
-            break;
+            return true;
         }
         if ((r = matchDiagDown(i)) != '-') {
-            //qDebug() << "matchDiagDown thinks " << r << "won.";
             announceWin(r);
-            break;
+            return true;
         }
         if ((r = matchDiagUp(i)) != '-') {
-            //qDebug() << "matchDiagUp thinks " << r << "won.";
             announceWin(r);
-            break;
+            return true;
         }
         if ((r = matchUpDown(i)) != '-') {
-            //qDebug() << "matchUpDown thinks " << r << "won.";
             announceWin(r);
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 void ConnectThree::announceWin(char winner)
 {
-    if (winner == 'b')
+    if (winner == 'B')
         QMessageBox::information(this, "Winner!", "You win! Excellent!");
-    else if (winner == '-')
-        QMessageBox::information(this, "Broken", "SHIT!");
     else
         QMessageBox::information(this, "Loser", "Ha ha ha ha ha you lost. You're a failure.");
     resetBoard();

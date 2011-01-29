@@ -36,10 +36,10 @@ void PieceSlot::maybeAddPiece(int i, QString color)
 void PieceSlot::resetSlot(int i)
 {
     if (i == my_id) {
-        qDebug() << "Signal received to reset slot " << i;
+        //qDebug() << "Signal received to reset slot " << i;
         int j;
         for(j = 0; j < num_spaces; j++) {
-            position[i]->setPixmap(QPixmap(":/pictures/blank.jpg"));
+            position[j]->setPixmap(QPixmap(":/pictures/blank.jpg"));
         }
         next_spot = num_spaces-1;
     }
