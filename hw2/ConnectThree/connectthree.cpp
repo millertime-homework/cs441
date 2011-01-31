@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <stdlib.h>
@@ -8,7 +9,8 @@
 #include "pieceslot.h"
 
 using std::string;
-
+using std::min;
+using std::max;
 
 // note that Black goes first, human is Black player.
 ConnectThree::ConnectThree(QWidget *parent) :
@@ -79,7 +81,7 @@ void ConnectThree::resetBoard()
 
 void ConnectThree::selectedSlot(int i)
 {
-    //if (whose_turn == "Black")
+    if (whose_turn == "Black")
         emit addPiece(i, whose_turn);
 }
 
@@ -87,19 +89,19 @@ void ConnectThree::changeTurn(int i)
 {
     updateBoardArray(i,whose_turn);
     int status = eval(columns);
-    if (status == 1) {
+    if (status == 2) {
         announceWin('R');
         return;
     } else if (status == -1) {
         announceWin('B');
         return;
-    } else if (status == 2) {
+    } else if (status == 1) {
         announceWin('D');   // draw
         return;
     }
     if (whose_turn == "Black") {
         whose_turn = "Red";
-        //enemyTurn();
+        enemyTurn();
     }
     else {
         whose_turn = "Black";
@@ -157,8 +159,9 @@ void ConnectThree::enemyTurn()
             new_board[k][l] = columns[k][l];   // copying whole board for evaluating
         }
     }
+    int best_move = -9000;
     for(i = 0; i < 3; i++) {
-        if (free_spaces(i) > 0) {
+        if (new_board[i][9] == '-') {
             // get minimax value for each possible move.
             int j;
             for(j = 0; j < 10; j++) {       // insert our move.
@@ -167,19 +170,54 @@ void ConnectThree::enemyTurn()
                     break;
                 }
             }
-            // might want to call a getMiniMax() function here.. returns which_column
-            int status = eval(new_board);
-            // this might need to go in play_*
-            //if (status != 0)        // check to see if game is over.
-                //return status;
-            // TODO: play_B goes here.
-            // and get max
-            // TODO: play_R goes here.
-            // and get min
-
+            int this_move = minimax(new_board, 'B');
+            if (this_move > best_move)
+                which_slot = i;
         }
     }
     emit addPiece(which_slot+1, "Red");
+}
+
+int ConnectThree::minimax(char board[3][10], char player)
+{
+    int returnval;
+    int status = eval(board);
+    if (status != 0)   // if at endgame state, give back the value
+        return status;
+    if (player == 'B') { // checking human move
+        qDebug() << "minimax checking human turn...";
+        returnval = 9000;   // it can't be OVER 9000 can it?!
+        int i;   // iterator for columns
+        for(i = 0; i < 3; i++) {
+            if (board[i][9] == '-') {  // last slot still available, not full
+                int j;
+                for(j = 0; j < 10; j++) {       // insert our move.
+                    if (board[i][j] == '-') {
+                        board[i][j] = 'B';
+                        break;
+                    }
+                }
+                returnval = min(returnval, minimax(board, 'R'));  // recurse
+            }
+        }
+    } else if (player == 'R') { // checking bot move
+        qDebug() << "minimax checking bot turn...";
+        returnval = -9000;
+        int i;
+        for(i = 0; i < 3; i++) {
+            if (board[i][9] == '-') {
+                int j;
+                for(j = 0; j < 10; j++) {
+                    if (board[i][j] == '-') {
+                        board[i][j] = 'R';
+                        break;
+                    }
+                }
+                returnval = max(returnval, minimax(board, 'B'));
+            }
+        }
+    }
+    return returnval;
 }
 
 char ConnectThree::matchAcross(int row, char board[3][10])
@@ -242,7 +280,7 @@ int ConnectThree::eval(char board[3][10])
             if (r == 'B')
                 return -1;  // oh noes human won
             else if (r == 'R')
-                return 1;   // skynet won
+                return 2;   // skynet won
         }
         // X
         //   X
@@ -251,16 +289,16 @@ int ConnectThree::eval(char board[3][10])
             if (r == 'B')
                 return -1;  // oh noes human won
             else if (r == 'R')
-                return 1;   // skynet won
+                return 2;   // skynet won
         }
         //     X
         //   X
         // X
         if ((r = matchDiagUp(i, board)) != '-') {
-            if (r == 'R')
+            if (r == 'B')
                 return -1;
             else if (r == 'R')
-                return 1;
+                return 2;
         }
         // X
         // X
@@ -269,11 +307,11 @@ int ConnectThree::eval(char board[3][10])
             if (r == 'B')
                 return -1;
             else if (r == 'R')
-                return 1;
+                return 2;
         }
         // last slot in each column taken? board full. draw.
         if ((board[0][9] != '-') && (board[1][9] != '-') && (board[2][9] != '-')) {
-            return 2;
+            return 1;
         }
     }
     return 0;

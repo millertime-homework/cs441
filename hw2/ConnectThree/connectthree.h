@@ -24,6 +24,7 @@ public:
 
 private:
     void enemyTurn();
+    int minimax(char[3][10], char);
     int free_spaces(int);
     void updateBoardArray(int,QString);
     int eval(char[3][10]);
