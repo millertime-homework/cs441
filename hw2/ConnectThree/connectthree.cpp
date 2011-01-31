@@ -9,6 +9,8 @@
 
 using std::string;
 
+
+// note that Black goes first, human is Black player.
 ConnectThree::ConnectThree(QWidget *parent) :
     QWidget(parent),num_columns(3),whose_turn("Black")
 {
@@ -77,18 +79,27 @@ void ConnectThree::resetBoard()
 
 void ConnectThree::selectedSlot(int i)
 {
-    if (whose_turn == "Black")
+    //if (whose_turn == "Black")
         emit addPiece(i, whose_turn);
 }
 
 void ConnectThree::changeTurn(int i)
 {
     updateBoardArray(i,whose_turn);
-    if (checkForWin())
+    int status = eval(columns);
+    if (status == 1) {
+        announceWin('R');
         return;
+    } else if (status == -1) {
+        announceWin('B');
+        return;
+    } else if (status == 2) {
+        announceWin('D');   // draw
+        return;
+    }
     if (whose_turn == "Black") {
         whose_turn = "Red";
-        enemyTurn();
+        //enemyTurn();
     }
     else {
         whose_turn = "Black";
@@ -137,98 +148,144 @@ int ConnectThree::free_spaces(int column)
 
 void ConnectThree::enemyTurn()
 {
-    if (free_spaces(0) != 0 || free_spaces(1) != 0 || free_spaces(2) != 0) {
-        int which_slot = rand() % 3;
-        while(free_spaces(which_slot) == 0) {
-            which_slot = ((which_slot+1) % 3);
+    int which_slot;      // we'll store the return value here
+    int i;               // iterate the columns
+    char new_board[3][10];     // temporary board to evaluate
+    int k,l;      // going to iterate through board
+    for(k = 0; k < 3; k++) {
+        for(l = 0; l < 10; l++) {
+            new_board[k][l] = columns[k][l];   // copying whole board for evaluating
         }
-        emit addPiece(which_slot+1, "Red");
-    } else {
-        QMessageBox::information(this, "Full", "The board is all full!");
-        resetBoard();
     }
+    for(i = 0; i < 3; i++) {
+        if (free_spaces(i) > 0) {
+            // get minimax value for each possible move.
+            int j;
+            for(j = 0; j < 10; j++) {       // insert our move.
+                if (new_board[i][j] == '-') {
+                    new_board[i][j] = 'R';
+                    break;
+                }
+            }
+            // might want to call a getMiniMax() function here.. returns which_column
+            int status = eval(new_board);
+            // this might need to go in play_*
+            //if (status != 0)        // check to see if game is over.
+                //return status;
+            // TODO: play_B goes here.
+            // and get max
+            // TODO: play_R goes here.
+            // and get min
+
+        }
+    }
+    emit addPiece(which_slot+1, "Red");
 }
 
-char ConnectThree::matchAcross(int row)
+char ConnectThree::matchAcross(int row, char board[3][10])
 {
-    if (columns[0][row] != '-' &&
-        ((columns[0][row] == columns[1][row]) &&
-         (columns[1][row] == columns[2][row]))) {
-        return columns[0][row];
+    if (board[0][row] != '-' &&
+        ((board[0][row] == board[1][row]) &&
+         (board[1][row] == board[2][row]))) {
+        return board[0][row];
     }
     else
         return '-';
 }
 
-char ConnectThree::matchDiagDown(int row)
+char ConnectThree::matchDiagDown(int row, char board[3][10])
 {
     if (row > 7)
         return '-';   // avoid an array index error
-    else if (columns[0][row+2] != '-' &&
-             (columns[0][row+2] == columns[1][row+1] &&
-              columns[1][row+1] == columns[2][row])) {
-        return columns[0][row+2];
+    else if (board[0][row+2] != '-' &&
+             (board[0][row+2] == board[1][row+1] &&
+              board[1][row+1] == board[2][row])) {
+        return board[0][row+2];
     }
     else
         return '-';
 }
 
-char ConnectThree::matchDiagUp(int row)
+char ConnectThree::matchDiagUp(int row, char board[3][10])
 {
     if (row > 7)
         return '-';   // avoid an array index error
-    else if (columns[0][row] != '-' &&
-             (columns[0][row] == columns[1][row+1] &&
-              columns[1][row+1] == columns[2][row+2])) {
-        return columns[0][row];
+    else if (board[0][row] != '-' &&
+             (board[0][row] == board[1][row+1] &&
+              board[1][row+1] == board[2][row+2])) {
+        return board[0][row];
     }
     else
         return '-';
 }
 
-char ConnectThree::matchUpDown(int row)
+char ConnectThree::matchUpDown(int row, char board[3][10])
 {
     int i;
     for(i = 0; i < 3; i++) {
-        if (columns[i][row] != '-' &&
-            (columns[i][row] == columns[i][row+1] &&
-             columns[i][row+1] == columns[i][row+2])) {
-            return columns[i][row];
+        if (board[i][row] != '-' &&
+            (board[i][row] == board[i][row+1] &&
+             board[i][row+1] == board[i][row+2])) {
+            return board[i][row];
         }
     }
     return '-';
 }
 
-bool ConnectThree::checkForWin()
+int ConnectThree::eval(char board[3][10])
 {
     int i;
     char r;
     for(i = 0; i < 10; i++) {
-        if ((r = matchAcross(i)) != '-') {
-            announceWin(r);
-            return true;
+        // X X X
+        if ((r = matchAcross(i, board)) != '-') {
+            if (r == 'B')
+                return -1;  // oh noes human won
+            else if (r == 'R')
+                return 1;   // skynet won
         }
-        if ((r = matchDiagDown(i)) != '-') {
-            announceWin(r);
-            return true;
+        // X
+        //   X
+        //     X
+        if ((r = matchDiagDown(i, board)) != '-') {
+            if (r == 'B')
+                return -1;  // oh noes human won
+            else if (r == 'R')
+                return 1;   // skynet won
         }
-        if ((r = matchDiagUp(i)) != '-') {
-            announceWin(r);
-            return true;
+        //     X
+        //   X
+        // X
+        if ((r = matchDiagUp(i, board)) != '-') {
+            if (r == 'R')
+                return -1;
+            else if (r == 'R')
+                return 1;
         }
-        if ((r = matchUpDown(i)) != '-') {
-            announceWin(r);
-            return true;
+        // X
+        // X
+        // X
+        if ((r = matchUpDown(i, board)) != '-') {
+            if (r == 'B')
+                return -1;
+            else if (r == 'R')
+                return 1;
+        }
+        // last slot in each column taken? board full. draw.
+        if ((board[0][9] != '-') && (board[1][9] != '-') && (board[2][9] != '-')) {
+            return 2;
         }
     }
-    return false;
+    return 0;
 }
 
 void ConnectThree::announceWin(char winner)
 {
     if (winner == 'B')
         QMessageBox::information(this, "Winner!", "You win! Excellent!");
-    else
+    else if (winner == 'R')
         QMessageBox::information(this, "Loser", "Ha ha ha ha ha you lost. You're a failure.");
+    else
+        QMessageBox::information(this, "Draw", "Filled the board! Draw!");
     resetBoard();
 }

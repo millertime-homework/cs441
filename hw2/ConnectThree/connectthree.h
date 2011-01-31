@@ -26,11 +26,11 @@ private:
     void enemyTurn();
     int free_spaces(int);
     void updateBoardArray(int,QString);
-    bool checkForWin();
-    char matchAcross(int);
-    char matchDiagDown(int);
-    char matchDiagUp(int);
-    char matchUpDown(int);
+    int eval(char[3][10]);
+    char matchAcross(int, char[3][10]);
+    char matchDiagDown(int, char[3][10]);
+    char matchDiagUp(int, char[3][10]);
+    char matchUpDown(int, char[3][10]);
     void announceWin(char);
     void resetBoard();
     void printArray();
