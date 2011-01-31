@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-TARGET = ConnectFour
+TARGET = ConnectThree
 TEMPLATE = app
 
 
