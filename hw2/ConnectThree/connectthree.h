@@ -28,13 +28,14 @@ private:
     int free_spaces(int);
     void updateBoardArray(int,QString);
     int eval(char[3][10]);
+    int nextSlot(char[3][10], int);
     char matchAcross(int, char[3][10]);
     char matchDiagDown(int, char[3][10]);
     char matchDiagUp(int, char[3][10]);
     char matchUpDown(int, char[3][10]);
     void announceWin(char);
     void resetBoard();
-    void printArray();
+    void printArray(char board[3][10]);
     QPushButton *quitButton;
     int num_columns;
     QString whose_turn;

@@ -123,14 +123,14 @@ void ConnectThree::updateBoardArray(int column, QString player)
     //printArray();
 }
 
-void ConnectThree::printArray()
+void ConnectThree::printArray(char board[3][10])
 {
     QString slot1, slot2, slot3;
     int i;
     for(i = 0; i < 10; i++) {
-        slot1 += columns[0][i];
-        slot2 += columns[1][i];
-        slot3 += columns[2][i];
+        slot1 += board[0][i];
+        slot2 += board[1][i];
+        slot3 += board[2][i];
     }
     qDebug() << slot1;
     qDebug() << slot2;
@@ -161,21 +161,29 @@ void ConnectThree::enemyTurn()
     }
     int best_move = -9000;
     for(i = 0; i < 3; i++) {
-        if (new_board[i][9] == '-') {
+        qDebug() << new_board[i][9];
+        if (new_board[i][0] == '-') {
             // get minimax value for each possible move.
-            int j;
-            for(j = 0; j < 10; j++) {       // insert our move.
-                if (new_board[i][j] == '-') {
-                    new_board[i][j] = 'R';
-                    break;
-                }
-            }
+            int ns = nextSlot(new_board, i);  // find next slot for this column
+            new_board[i][ns] = 'R';       // insert there
             int this_move = minimax(new_board, 'B');
+            qDebug() << "Got score of " << this_move << " for slot " << i;
             if (this_move > best_move)
                 which_slot = i;
         }
     }
     emit addPiece(which_slot+1, "Red");
+}
+
+int ConnectThree::nextSlot(char board[3][10], int column)
+{
+    int i;
+    for(i = 0; i < 10; i++) {
+        if (board[column][i] == '-') {
+            return i;
+        }
+    }
+    return 0;  // shouldn't reach here
 }
 
 int ConnectThree::minimax(char board[3][10], char player)
@@ -185,34 +193,26 @@ int ConnectThree::minimax(char board[3][10], char player)
     if (status != 0)   // if at endgame state, give back the value
         return status;
     if (player == 'B') { // checking human move
-        qDebug() << "minimax checking human turn...";
+        qDebug() << "Checking human move...";
+        printArray(board);
         returnval = 9000;   // it can't be OVER 9000 can it?!
         int i;   // iterator for columns
         for(i = 0; i < 3; i++) {
             if (board[i][9] == '-') {  // last slot still available, not full
-                int j;
-                for(j = 0; j < 10; j++) {       // insert our move.
-                    if (board[i][j] == '-') {
-                        board[i][j] = 'B';
-                        break;
-                    }
-                }
+                int ns = nextSlot(board, i);
+                board[i][ns] = 'B';
                 returnval = min(returnval, minimax(board, 'R'));  // recurse
             }
         }
     } else if (player == 'R') { // checking bot move
-        qDebug() << "minimax checking bot turn...";
+        qDebug() << "Checking bot move...";
+        printArray(board);
         returnval = -9000;
         int i;
         for(i = 0; i < 3; i++) {
             if (board[i][9] == '-') {
-                int j;
-                for(j = 0; j < 10; j++) {
-                    if (board[i][j] == '-') {
-                        board[i][j] = 'R';
-                        break;
-                    }
-                }
+                int ns = nextSlot(board, i);
+                board[i][ns] = 'R';
                 returnval = max(returnval, minimax(board, 'B'));
             }
         }
