@@ -152,7 +152,7 @@ void ConnectThree::enemyTurn()
     for(i = 0; i < 3; i++) {
         if (new_board[i][9] == '-') {
             // get minimax value for each possible move.
-            int this_move = minimax(new_board, 'R');
+            int this_move = tryRed(new_board);
             qDebug() << "Got score of " << this_move << " for slot " << i;
             if (this_move > best_move) {
                 which_slot = i;
@@ -174,50 +174,56 @@ int ConnectThree::nextSlot(char board[3][10], int column)
     return 0;  // shouldn't reach here
 }
 
-int ConnectThree::minimax(char board[3][10], char player)
+int ConnectThree::tryRed(char board[3][10])
 {
-    int returnval = 0;
     int status = eval(board);
     //qDebug() << "Board score: " << status;
     if (status != 0)   // if at endgame state, give back the value
         return status;
-    if (player == 'B') { // checking human move
-        //qDebug() << "Checking human move...";
-        //printArray(board);
-        returnval = 9000;   // it can't be OVER 9000 can it?!
-        int i;   // iterator for columns
-        for(i = 0; i < 3; i++) {
-            if (board[i][9] == '-') {  // last slot still available, not full
-	        char new_board[3][10];
-	        int j,k;
-		for(j = 0; j < 3; j++) {
-		    for(k = 0; k < 10; k++) {
-		        new_board[j][k] = board[j][k];
-		    }
-		}
-	        int ns = nextSlot(new_board, i);
-                new_board[i][ns] = 'B';
-                returnval = min(returnval, minimax(new_board, 'R'));  // recurse
+    qDebug() << "Checking human move...";
+    //printArray(board);
+    int returnval = 9000;   // it can't be OVER 9000 can it?!
+    int i;   // iterator for columns
+    for(i = 0; i < 3; i++) {
+        if (board[i][9] == '-') {  // last slot still available, not full
+            char new_board[3][10];
+            int j,k;
+            for(j = 0; j < 3; j++) {
+                for(k = 0; k < 10; k++) {
+                    new_board[j][k] = board[j][k];
+                }
             }
+            int ns = nextSlot(new_board, i);
+            new_board[i][ns] = 'B';
+            qDebug() << "Trying slot " << (i+1);
+            returnval = min(returnval, tryBlack(new_board));  // recurse
         }
-    } else if (player == 'R') { // checking bot move
-        //qDebug() << "Checking bot move...";
-        //printArray(board);
-        returnval = -9000;
-        int i;
-        for(i = 0; i < 3; i++) {
-            if (board[i][9] == '-') {
-	        char new_board[3][10];
-	        int j,k;
-		for(j = 0; j < 3; j++) {
-		    for(k = 0; k < 10; k++) {
-		        new_board[j][k] = board[j][k];
-		    }
-		}
-                int ns = nextSlot(new_board, i);
-                new_board[i][ns] = 'R';
-                returnval = max(returnval, minimax(new_board, 'B'));
+    }
+    return returnval;
+}
+
+int ConnectThree::tryBlack(char board[3][10])
+{
+    int status = eval(board);
+    if (status != 0)
+        return status;
+    qDebug() << "Checking bot move...";
+    //printArray(board);
+    int returnval = -9000;
+    int i;
+    for(i = 0; i < 3; i++) {
+        if (board[i][9] == '-') {
+            char new_board[3][10];
+            int j,k;
+            for(j = 0; j < 3; j++) {
+                for(k = 0; k < 10; k++) {
+                    new_board[j][k] = board[j][k];
+                }
             }
+            int ns = nextSlot(new_board, i);
+            new_board[i][ns] = 'R';
+            qDebug() << "Trying slot " << (i+1);
+            returnval = max(returnval, tryRed(new_board));
         }
     }
     return returnval;
