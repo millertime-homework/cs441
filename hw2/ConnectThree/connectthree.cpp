@@ -88,7 +88,7 @@ void ConnectThree::selectedSlot(int i)
 void ConnectThree::changeTurn(int i)
 {
     updateBoardArray(i,whose_turn);
-    int status = eval(columns);
+    int status = eval(columns, 'R');
     if (status == 2) {
         announceWin('R');
         return;
@@ -152,14 +152,15 @@ void ConnectThree::enemyTurn()
     for(i = 0; i < 3; i++) {
         if (new_board[i][9] == '-') {
             // get minimax value for each possible move.
-            int this_move = tryRed(new_board);
-            qDebug() << "Got score of " << this_move << " for slot " << i;
+            int this_move = tryRed(new_board, 3);
+            //qDebug() << "Got score of " << this_move << " for slot " << i;
             if (this_move > best_move) {
                 which_slot = i;
 		best_move = this_move;
 	    }
         }
     }
+    qDebug() << "Decided on slot.. " << which_slot << " score=" << best_move;
     emit addPiece(which_slot+1, "Red");
 }
 
@@ -174,15 +175,14 @@ int ConnectThree::nextSlot(char board[3][10], int column)
     return 0;  // shouldn't reach here
 }
 
-int ConnectThree::tryRed(char board[3][10])
+int ConnectThree::tryRed(char board[3][10], int depth)
 {
-    int status = eval(board);
+    int status = eval(board, 'R');
     //qDebug() << "Board score: " << status;
-    if (status != 0)   // if at endgame state, give back the value
+    if ((status != 0) || (depth == 0))
         return status;
-    qDebug() << "Checking human move...";
-    //printArray(board);
-    int returnval = 9000;   // it can't be OVER 9000 can it?!
+    qDebug() << "Checking bot move, at depth " << depth;
+    int returnval = -9000;   // it can't be OVER 9000 can it?!
     int i;   // iterator for columns
     for(i = 0; i < 3; i++) {
         if (board[i][9] == '-') {  // last slot still available, not full
@@ -194,22 +194,23 @@ int ConnectThree::tryRed(char board[3][10])
                 }
             }
             int ns = nextSlot(new_board, i);
-            new_board[i][ns] = 'B';
-            qDebug() << "Trying slot " << (i+1);
-            returnval = min(returnval, tryBlack(new_board));  // recurse
+            new_board[i][ns] = 'R';
+            qDebug() << "Trying R in slot " << i;
+            printArray(new_board);
+            //qDebug() << "Trying slot " << (i+1);
+            returnval = max(returnval, tryBlack(new_board, depth-1));  // recurse
         }
     }
     return returnval;
 }
 
-int ConnectThree::tryBlack(char board[3][10])
+int ConnectThree::tryBlack(char board[3][10], int depth)
 {
-    int status = eval(board);
-    if (status != 0)
+    int status = eval(board, 'B');
+    if ((status != 0) || (depth == 0))
         return status;
-    qDebug() << "Checking bot move...";
-    //printArray(board);
-    int returnval = -9000;
+    qDebug() << "Checking human move, at depth " << depth;
+    int returnval = 9000;
     int i;
     for(i = 0; i < 3; i++) {
         if (board[i][9] == '-') {
@@ -221,9 +222,11 @@ int ConnectThree::tryBlack(char board[3][10])
                 }
             }
             int ns = nextSlot(new_board, i);
-            new_board[i][ns] = 'R';
-            qDebug() << "Trying slot " << (i+1);
-            returnval = max(returnval, tryRed(new_board));
+            new_board[i][ns] = 'B';
+            qDebug() << "Trying B in slot " << i;
+            printArray(new_board);
+            //qDebug() << "Trying slot " << (i+1);
+            returnval = min(returnval, tryRed(new_board, depth-1));
         }
     }
     return returnval;
@@ -279,43 +282,47 @@ char ConnectThree::matchUpDown(int row, char board[3][10])
     return '-';
 }
 
-int ConnectThree::eval(char board[3][10])
+int ConnectThree::eval(char board[3][10], char good_guy)
 {
     int i;
-    char r;
+    char r, bad_guy;
+    if (good_guy == 'B')
+        bad_guy = 'R';
+    else
+        bad_guy = 'B';
     for(i = 0; i < 10; i++) {
         // X X X
         if ((r = matchAcross(i, board)) != '-') {
-            if (r == 'B')
-                return -1;  // oh noes human won
-            else if (r == 'R')
-                return 2;   // skynet won
+            if (r == bad_guy)
+                return -1;  // bad guy won
+            else if (r == good_guy)
+                return 2;   // good guy won
         }
         // X
         //   X
         //     X
         if ((r = matchDiagDown(i, board)) != '-') {
-            if (r == 'B')
-                return -1;  // oh noes human won
-            else if (r == 'R')
-                return 2;   // skynet won
+            if (r == bad_guy)
+                return -1;
+            else if (r == good_guy)
+                return 2;
         }
         //     X
         //   X
         // X
         if ((r = matchDiagUp(i, board)) != '-') {
-            if (r == 'B')
+            if (r == bad_guy)
                 return -1;
-            else if (r == 'R')
+            else if (r == good_guy)
                 return 2;
         }
         // X
         // X
         // X
         if ((r = matchUpDown(i, board)) != '-') {
-            if (r == 'B')
+            if (r == bad_guy)
                 return -1;
-            else if (r == 'R')
+            else if (r == good_guy)
                 return 2;
         }
         // last slot in each column taken? board full. draw.

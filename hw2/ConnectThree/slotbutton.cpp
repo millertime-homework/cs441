@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "slotbutton.h"
 
 SlotButton::SlotButton(const QString & text, int i, QWidget *parent) :

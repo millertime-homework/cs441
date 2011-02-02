@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "pieceslot.h"
 
 PieceSlot::PieceSlot(int id, int n, QWidget *parent) :

@@ -24,10 +24,10 @@ public:
 
 private:
     void enemyTurn();
-    int tryRed(char[3][10]);
-    int tryBlack(char[3][10]);
+    int tryRed(char[3][10], int);
+    int tryBlack(char[3][10], int);
     void updateBoardArray(int,QString);
-    int eval(char[3][10]);
+    int eval(char[3][10], char);
     int nextSlot(char[3][10], int);
     char matchAcross(int, char[3][10]);
     char matchDiagDown(int, char[3][10]);
