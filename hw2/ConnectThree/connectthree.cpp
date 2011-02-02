@@ -120,7 +120,7 @@ void ConnectThree::updateBoardArray(int column, QString player)
             break;
         }
     }
-    //printArray();
+    //printArray(columns);
 }
 
 void ConnectThree::printArray(char board[3][10])
@@ -149,18 +149,23 @@ void ConnectThree::enemyTurn()
         }
     }
     int best_move = -9000;
+    // get minimax value for each possible move.
     for(i = 0; i < 3; i++) {
+        // only try on columns that are available
         if (new_board[i][9] == '-') {
-            // get minimax value for each possible move.
-            int this_move = tryRed(new_board, 3);
-            //qDebug() << "Got score of " << this_move << " for slot " << i;
-            if (this_move > best_move) {
+            // have to insert into the temp board before minimaxing
+            int ns = nextSlot(new_board, i);
+            new_board[i][ns] = 'R';
+            // now start trying to add enemy pieces and go from there...
+            int score = tryBlack(new_board, 7);
+            if (score > best_move) {
+                // get the best result, store it..
+                best_move = score;
                 which_slot = i;
-		best_move = this_move;
-	    }
+            }
         }
     }
-    qDebug() << "Decided on slot.. " << which_slot << " score=" << best_move;
+    // now actually play, based on the best minimax result
     emit addPiece(which_slot+1, "Red");
 }
 
@@ -177,11 +182,11 @@ int ConnectThree::nextSlot(char board[3][10], int column)
 
 int ConnectThree::tryRed(char board[3][10], int depth)
 {
-    int status = eval(board, 'R');
+    int status = eval(board, 'B');
     //qDebug() << "Board score: " << status;
     if ((status != 0) || (depth == 0))
         return status;
-    qDebug() << "Checking bot move, at depth " << depth;
+    //qDebug() << "Checking bot move, at depth " << depth;
     int returnval = -9000;   // it can't be OVER 9000 can it?!
     int i;   // iterator for columns
     for(i = 0; i < 3; i++) {
@@ -195,21 +200,30 @@ int ConnectThree::tryRed(char board[3][10], int depth)
             }
             int ns = nextSlot(new_board, i);
             new_board[i][ns] = 'R';
-            qDebug() << "Trying R in slot " << i;
-            printArray(new_board);
+            //qDebug() << "Trying R in slot " << i;
+            //printArray(new_board);
+            //int score = eval(new_board, 'R');
+            //qDebug() << "The score for this board is " << score;
             //qDebug() << "Trying slot " << (i+1);
-            returnval = max(returnval, tryBlack(new_board, depth-1));  // recurse
+            //qDebug() << "Current val for tryRed max is " << returnval;
+            int score = tryBlack(new_board, depth-1);  // recurse
+            if (score > returnval) {
+                returnval = score;
+                qDebug() << "tryRed updating max to " << score;
+            }
+            //qDebug() << "New val for tryRed max is " << returnval;
         }
     }
+    qDebug() << "Passing max up. Val is " << returnval;
     return returnval;
 }
 
 int ConnectThree::tryBlack(char board[3][10], int depth)
 {
-    int status = eval(board, 'B');
+    int status = eval(board, 'R');
     if ((status != 0) || (depth == 0))
         return status;
-    qDebug() << "Checking human move, at depth " << depth;
+    //qDebug() << "Checking human move, at depth " << depth;
     int returnval = 9000;
     int i;
     for(i = 0; i < 3; i++) {
@@ -223,12 +237,21 @@ int ConnectThree::tryBlack(char board[3][10], int depth)
             }
             int ns = nextSlot(new_board, i);
             new_board[i][ns] = 'B';
-            qDebug() << "Trying B in slot " << i;
-            printArray(new_board);
+            //qDebug() << "Trying B in slot " << i;
+            //printArray(new_board);
+            //int score = eval(new_board, 'B');
+            //qDebug() << "The score for this board is " << score;
             //qDebug() << "Trying slot " << (i+1);
-            returnval = min(returnval, tryRed(new_board, depth-1));
+            //qDebug() << "Current val for tryBlack min is " << returnval;
+            int score = tryRed(new_board, depth-1);
+            if (score < returnval) {
+                returnval = score;
+                qDebug() << "tryBlack updating min to " << score;
+            }
+            //qDebug() << "New val for tryBlack min is " << returnval;
         }
     }
+    qDebug() << "Passing min up. Val is " << returnval;
     return returnval;
 }
 
