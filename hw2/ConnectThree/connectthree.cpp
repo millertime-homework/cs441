@@ -12,9 +12,8 @@ using std::string;
 using std::min;
 using std::max;
 
-// note that Black goes first, human is Black player.
 ConnectThree::ConnectThree(QWidget *parent) :
-    QWidget(parent),num_columns(3),whose_turn("Black")
+    QWidget(parent),num_columns(3),whose_turn("Red")
 {
     srand(time(NULL));  //seed my random turn generator
 
@@ -59,6 +58,7 @@ ConnectThree::ConnectThree(QWidget *parent) :
 
     setLayout(mainLayout);
     setWindowTitle(tr("Connect Three"));
+    enemyTurn();
 }
 
 ConnectThree::~ConnectThree()
@@ -76,7 +76,8 @@ void ConnectThree::resetBoard()
         for(j = 0; j < 10; j++)
             columns[i][j] = '-';
     }
-    whose_turn = "Black";
+    whose_turn = "Red";
+    enemyTurn();
 }
 
 void ConnectThree::selectedSlot(int i)
@@ -204,7 +205,7 @@ int ConnectThree::tryRed(char board[3][10], int depth)
             }
         }
     }
-    return returnval;
+    return returnval * (depth+1);
 }
 
 int ConnectThree::tryBlack(char board[3][10], int depth)
@@ -231,7 +232,7 @@ int ConnectThree::tryBlack(char board[3][10], int depth)
             }
         }
     }
-    return returnval;
+    return returnval * (depth+1);
 }
 
 char ConnectThree::matchAcross(int row, char board[3][10])
