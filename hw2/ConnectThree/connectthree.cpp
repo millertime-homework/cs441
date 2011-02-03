@@ -92,7 +92,7 @@ void ConnectThree::changeTurn(int i)
     if (status == 2) {
         announceWin('R');
         return;
-    } else if (status == -1) {
+    } else if (status == -2) {
         announceWin('B');
         return;
     } else if (status == 1) {
@@ -141,23 +141,23 @@ void ConnectThree::enemyTurn()
 {
     int which_slot = 0;      // we'll store the return value here
     int i;               // iterate the columns
-    char new_board[3][10];     // temporary board to evaluate
-    int k,l;      // going to iterate through board
-    for(k = 0; k < 3; k++) {
-        for(l = 0; l < 10; l++) {
-            new_board[k][l] = columns[k][l];   // copying whole board for evaluating
-        }
-    }
     int best_move = -9000;
     // get minimax value for each possible move.
     for(i = 0; i < 3; i++) {
         // only try on columns that are available
-        if (new_board[i][9] == '-') {
+        if (columns[i][9] == '-') {
             // have to insert into the temp board before minimaxing
+            char new_board[3][10];     // temporary board to evaluate
+            int k,l;
+            for(k = 0; k < 3; k++) {
+                for(l = 0; l < 10; l++) {
+                    new_board[k][l] = columns[k][l];   // copying whole board for evaluating
+                }
+            }
             int ns = nextSlot(new_board, i);
             new_board[i][ns] = 'R';
             // now start trying to add enemy pieces and go from there...
-            int score = tryBlack(new_board, 7);
+            int score = tryBlack(new_board, 10);
             if (score > best_move) {
                 // get the best result, store it..
                 best_move = score;
@@ -182,11 +182,9 @@ int ConnectThree::nextSlot(char board[3][10], int column)
 
 int ConnectThree::tryRed(char board[3][10], int depth)
 {
-    int status = eval(board, 'B');
-    //qDebug() << "Board score: " << status;
+    int status = 0 - eval(board, 'B');
     if ((status != 0) || (depth == 0))
         return status;
-    //qDebug() << "Checking bot move, at depth " << depth;
     int returnval = -9000;   // it can't be OVER 9000 can it?!
     int i;   // iterator for columns
     for(i = 0; i < 3; i++) {
@@ -200,21 +198,12 @@ int ConnectThree::tryRed(char board[3][10], int depth)
             }
             int ns = nextSlot(new_board, i);
             new_board[i][ns] = 'R';
-            //qDebug() << "Trying R in slot " << i;
-            //printArray(new_board);
-            //int score = eval(new_board, 'R');
-            //qDebug() << "The score for this board is " << score;
-            //qDebug() << "Trying slot " << (i+1);
-            //qDebug() << "Current val for tryRed max is " << returnval;
             int score = tryBlack(new_board, depth-1);  // recurse
             if (score > returnval) {
                 returnval = score;
-                qDebug() << "tryRed updating max to " << score;
             }
-            //qDebug() << "New val for tryRed max is " << returnval;
         }
     }
-    qDebug() << "Passing max up. Val is " << returnval;
     return returnval;
 }
 
@@ -223,7 +212,6 @@ int ConnectThree::tryBlack(char board[3][10], int depth)
     int status = eval(board, 'R');
     if ((status != 0) || (depth == 0))
         return status;
-    //qDebug() << "Checking human move, at depth " << depth;
     int returnval = 9000;
     int i;
     for(i = 0; i < 3; i++) {
@@ -237,21 +225,12 @@ int ConnectThree::tryBlack(char board[3][10], int depth)
             }
             int ns = nextSlot(new_board, i);
             new_board[i][ns] = 'B';
-            //qDebug() << "Trying B in slot " << i;
-            //printArray(new_board);
-            //int score = eval(new_board, 'B');
-            //qDebug() << "The score for this board is " << score;
-            //qDebug() << "Trying slot " << (i+1);
-            //qDebug() << "Current val for tryBlack min is " << returnval;
             int score = tryRed(new_board, depth-1);
             if (score < returnval) {
                 returnval = score;
-                qDebug() << "tryBlack updating min to " << score;
             }
-            //qDebug() << "New val for tryBlack min is " << returnval;
         }
     }
-    qDebug() << "Passing min up. Val is " << returnval;
     return returnval;
 }
 
@@ -294,6 +273,8 @@ char ConnectThree::matchDiagUp(int row, char board[3][10])
 
 char ConnectThree::matchUpDown(int row, char board[3][10])
 {
+    if (row > 7)
+        return '-';
     int i;
     for(i = 0; i < 3; i++) {
         if (board[i][row] != '-' &&
@@ -317,7 +298,7 @@ int ConnectThree::eval(char board[3][10], char good_guy)
         // X X X
         if ((r = matchAcross(i, board)) != '-') {
             if (r == bad_guy)
-                return -1;  // bad guy won
+                return -2;  // bad guy won
             else if (r == good_guy)
                 return 2;   // good guy won
         }
@@ -326,7 +307,7 @@ int ConnectThree::eval(char board[3][10], char good_guy)
         //     X
         if ((r = matchDiagDown(i, board)) != '-') {
             if (r == bad_guy)
-                return -1;
+                return -2;
             else if (r == good_guy)
                 return 2;
         }
@@ -335,7 +316,7 @@ int ConnectThree::eval(char board[3][10], char good_guy)
         // X
         if ((r = matchDiagUp(i, board)) != '-') {
             if (r == bad_guy)
-                return -1;
+                return -2;
             else if (r == good_guy)
                 return 2;
         }
@@ -344,7 +325,7 @@ int ConnectThree::eval(char board[3][10], char good_guy)
         // X
         if ((r = matchUpDown(i, board)) != '-') {
             if (r == bad_guy)
-                return -1;
+                return -2;
             else if (r == good_guy)
                 return 2;
         }
