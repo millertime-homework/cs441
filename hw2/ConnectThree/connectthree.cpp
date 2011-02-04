@@ -184,10 +184,9 @@ void ConnectThree::enemyTurn()
     for(i = 0; i < 3; i++) {
       if (!is_full[i]) {
 	int mm = minimaxes[i].result();
-        qDebug() << "Slot " << i << "got a minimax of " << mm;
 	if (mm > best) {
 	  best = mm;
-          which_column = i;
+          which_column = minimaxes[i].getCol();
 	}
       }
     }

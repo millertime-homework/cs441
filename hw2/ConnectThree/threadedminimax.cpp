@@ -18,17 +18,19 @@ int ThreadedMinimax::result()
     return my_val;
 }
 
+int ThreadedMinimax::getCol()
+{
+    return column;
+}
+
 void ThreadedMinimax::run()
 {
-    int ns = daddy->nextSlot(board,column);
-    board[column][ns] = 'R';
     my_val = tryBlack(board, 3);
 }
 
 int ThreadedMinimax::tryRed(char board[3][10], int depth)
 {
     int status = 0 - daddy->eval(board, 'B');
-    //qDebug() << "tryRed, depth " << depth << ", score " << status;
     if ((status != 0) || (depth == 0))
         return status;
     int returnval = -9000;   // it can't be OVER 9000 can it?!
@@ -50,14 +52,12 @@ int ThreadedMinimax::tryRed(char board[3][10], int depth)
             }
         }
     }
-    qDebug() << "About to multiply min " << returnval << "times depth " << depth;
     return returnval * (depth+1);
 }
 
 int ThreadedMinimax::tryBlack(char board[3][10], int depth)
 {
     int status = daddy->eval(board, 'R');
-    //qDebug() << "tryBlack, depth " << depth << ", score " << status;
     if ((status != 0) || (depth == 0))
         return status;
     int returnval = 9000;
@@ -79,6 +79,5 @@ int ThreadedMinimax::tryBlack(char board[3][10], int depth)
             }
         }
     }
-    qDebug() << "About to multiply min " << returnval << "times depth " << depth;
     return returnval * (depth+1);
 }

@@ -23,11 +23,10 @@ public:
     ~ConnectThree();
     int eval(char[3][10], char);
     int nextSlot(char[3][10], int);
+    void printArray(char board[3][10]);
 
 private:
     void enemyTurn();
-    int tryRed(char[3][10], int);
-    int tryBlack(char[3][10], int);
     void updateBoardArray(int,QString);
     char matchAcross(int, char[3][10]);
     char matchDiagDown(int, char[3][10]);
@@ -35,7 +34,6 @@ private:
     char matchUpDown(int, char[3][10]);
     void announceWin(char);
     void resetBoard();
-    void printArray(char board[3][10]);
     QPushButton *quitButton;
     int num_columns;
     QString whose_turn;

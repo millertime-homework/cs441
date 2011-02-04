@@ -12,6 +12,7 @@ class ThreadedMinimax : public QThread
 public:
     void init(ConnectThree*, int, char[3][10]);
     int result();
+    int getCol();
 
 protected:
     void run();
