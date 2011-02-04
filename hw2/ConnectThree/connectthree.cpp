@@ -7,6 +7,7 @@
 #include "connectthree.h"
 #include "slotbutton.h"
 #include "pieceslot.h"
+#include "threadedminimax.h"
 
 using std::string;
 using std::min;
@@ -140,34 +141,58 @@ void ConnectThree::printArray(char board[3][10])
 
 void ConnectThree::enemyTurn()
 {
-    int which_slot = 0;      // we'll store the return value here
-    int i;               // iterate the columns
-    int best_move = -9000;
-    // get minimax value for each possible move.
+    // start new threads for each possible move to get minimax value.
+    ThreadedMinimax minimaxes[3];
+
+    // keep track of full columns
+    bool is_full[3];
+
+    int i;
     for(i = 0; i < 3; i++) {
-        // only try on columns that are available
-        if (columns[i][9] == '-') {
-            // have to insert into the temp board before minimaxing
-            char new_board[3][10];     // temporary board to evaluate
-            int k,l;
-            for(k = 0; k < 3; k++) {
-                for(l = 0; l < 10; l++) {
-                    new_board[k][l] = columns[k][l];   // copying whole board for evaluating
-                }
-            }
-            int ns = nextSlot(new_board, i);
-            new_board[i][ns] = 'R';
-            // now start trying to add enemy pieces and go from there...
-            int score = tryBlack(new_board, 10);
-            if (score > best_move) {
-                // get the best result, store it..
-                best_move = score;
-                which_slot = i;
-            }
-        }
+      // only try on columns that are available
+      if (columns[i][9] == '-') {
+	is_full[i] = false;
+	// have to insert into the temp board before minimaxing
+	char new_board[3][10];
+	int k,l;
+	for(k = 0; k < 3; k++) {
+	  for(l = 0; l < 10; l++) {
+	    new_board[k][l] = columns[k][l];
+	  }
+	}
+	int ns = nextSlot(new_board, i);
+        new_board[i][ns] = 'R';
+        minimaxes[i].init(this, i, new_board);
+      }
+    }
+
+    // start the threads
+    for(i = 0; i < 3; i++) {
+      if (!is_full[i])
+	minimaxes[i].start();
+    }
+    
+    // wait for the threads to finish
+    for(i = 0; i < 3; i++) {
+      if (!is_full[i])
+	minimaxes[i].wait();
+    }
+
+    // get the best value
+    int best = -9000;
+    int which_column;
+    for(i = 0; i < 3; i++) {
+      if (!is_full[i]) {
+	int mm = minimaxes[i].result();
+        qDebug() << "Slot " << i << "got a minimax of " << mm;
+	if (mm > best) {
+	  best = mm;
+          which_column = i;
+	}
+      }
     }
     // now actually play, based on the best minimax result
-    emit addPiece(which_slot+1, "Red");
+    emit addPiece(which_column+1, "Red");
 }
 
 int ConnectThree::nextSlot(char board[3][10], int column)
@@ -179,60 +204,6 @@ int ConnectThree::nextSlot(char board[3][10], int column)
         }
     }
     return 0;  // shouldn't reach here
-}
-
-int ConnectThree::tryRed(char board[3][10], int depth)
-{
-    int status = 0 - eval(board, 'B');
-    if ((status != 0) || (depth == 0))
-        return status;
-    int returnval = -9000;   // it can't be OVER 9000 can it?!
-    int i;   // iterator for columns
-    for(i = 0; i < 3; i++) {
-        if (board[i][9] == '-') {  // last slot still available, not full
-            char new_board[3][10];
-            int j,k;
-            for(j = 0; j < 3; j++) {
-                for(k = 0; k < 10; k++) {
-                    new_board[j][k] = board[j][k];
-                }
-            }
-            int ns = nextSlot(new_board, i);
-            new_board[i][ns] = 'R';
-            int score = tryBlack(new_board, depth-1);  // recurse
-            if (score > returnval) {
-                returnval = score;
-            }
-        }
-    }
-    return returnval * (depth+1);
-}
-
-int ConnectThree::tryBlack(char board[3][10], int depth)
-{
-    int status = eval(board, 'R');
-    if ((status != 0) || (depth == 0))
-        return status;
-    int returnval = 9000;
-    int i;
-    for(i = 0; i < 3; i++) {
-        if (board[i][9] == '-') {
-            char new_board[3][10];
-            int j,k;
-            for(j = 0; j < 3; j++) {
-                for(k = 0; k < 10; k++) {
-                    new_board[j][k] = board[j][k];
-                }
-            }
-            int ns = nextSlot(new_board, i);
-            new_board[i][ns] = 'B';
-            int score = tryRed(new_board, depth-1);
-            if (score < returnval) {
-                returnval = score;
-            }
-        }
-    }
-    return returnval * (depth+1);
 }
 
 char ConnectThree::matchAcross(int row, char board[3][10])
