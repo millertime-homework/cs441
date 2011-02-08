@@ -1,3 +1,10 @@
+/* Copyright (c) 2011 Russell Miller
+MIT License - please see included COPYING file
+or visit www.opensource.org/licenses/mit-license
+
+pieceslot.h
+*/
+
 #ifndef PIECESLOT_H
 #define PIECESLOT_H
 

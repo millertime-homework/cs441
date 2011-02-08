@@ -1,3 +1,10 @@
+/* Copyright (c) 2011 Russell Miller
+MIT License - please see included COPYING file
+or visit www.opensource.org/licenses/mit-license
+
+connectthree.h
+*/
+
 #ifndef CONNECTTHREE_H
 #define CONNECTTHREE_H
 
