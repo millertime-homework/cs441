@@ -87,10 +87,10 @@ int Board::eval(char player)
             else if (r == player)
                 return 2;
         }
-        // last slot in each column taken? board full. draw.
-        if (isFull()) {
-            return 1;
-        }
+    }
+    // last slot in each column taken? board full. draw.
+    if (isFull()) {
+        return 1;
     }
     return 0;
 }

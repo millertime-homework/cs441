@@ -235,7 +235,7 @@ void ConnectThree::proof()
 int ConnectThree::proofTakeTurn(Board & board, char player)
 {
     int col; // going to be iterated
-    int which_col;  // going to be best col, which will be returned
+    int which_col = 1;  // going to be best col, which will be returned
     int best_score;
     if (player == 'R')
         best_score = -9000;  // using the same minimax.. this player is the "max"
