@@ -2,6 +2,7 @@
 #define CONNECTTHREE_H
 
 #include <QtGui>
+#include "board.h"
 
 class QLabel;
 class QPushButton;
@@ -13,33 +14,28 @@ class ConnectThree : public QWidget
 public slots:
     void selectedSlot(int);
     void changeTurn(int);
+    void canHasProof();
 
 signals:
-    void addPiece(int,QString);
+    void addPiece(int,char);
     void resetSlot(int);
 
 public:
     ConnectThree(QWidget *parent = 0);
     ~ConnectThree();
+    void proof();
+    int proofTakeTurn(Board &, char);
 
 private:
     void enemyTurn();
-    int tryRed(char[3][10], int);
-    int tryBlack(char[3][10], int);
-    void updateBoardArray(int,QString);
-    int eval(char[3][10], char);
-    int nextSlot(char[3][10], int);
-    char matchAcross(int, char[3][10]);
-    char matchDiagDown(int, char[3][10]);
-    char matchDiagUp(int, char[3][10]);
-    char matchUpDown(int, char[3][10]);
+    int tryRed(Board &, int);
+    int tryBlack(Board &, int);
     void announceWin(char);
-    void resetBoard();
-    void printArray(char board[3][10]);
+    void printArray(Board &);
     QPushButton *quitButton;
-    int num_columns;
-    QString whose_turn;
-    char columns[3][10];
+    QPushButton *testButton;
+    char whose_turn;
+    Board *gameboard;
 };
 
 #endif // MAINWINDOW_H

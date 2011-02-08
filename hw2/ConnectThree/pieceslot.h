@@ -14,7 +14,7 @@ signals:
     void pieceAdded(int);
 
 public slots:
-    void maybeAddPiece(int,QString);
+    void maybeAddPiece(int,char);
     void resetSlot(int);
 
 private:

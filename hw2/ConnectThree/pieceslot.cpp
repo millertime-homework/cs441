@@ -22,10 +22,10 @@ PieceSlot::~PieceSlot()
     }
 }
 
-void PieceSlot::maybeAddPiece(int i, QString color)
+void PieceSlot::maybeAddPiece(int i, char color)
 {
     if ((i == my_id) && !full()) {
-        if (color == "Black") {
+        if (color == 'B') {
             position[next_spot--]->setPixmap(QPixmap(":/pictures/black.jpg"));
         } else {
             position[next_spot--]->setPixmap(QPixmap(":/pictures/red.jpg"));

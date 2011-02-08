@@ -13,11 +13,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         connectthree.cpp \
     slotbutton.cpp \
-    pieceslot.cpp
+    pieceslot.cpp \
+    board.cpp
 
 HEADERS  += connectthree.h \
     slotbutton.h \
-    pieceslot.h
+    pieceslot.h \
+    board.h
 
 FORMS    +=
 
