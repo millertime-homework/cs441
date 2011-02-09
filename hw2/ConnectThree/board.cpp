@@ -244,6 +244,13 @@ int Board::nextSlot(int col)
     return 0;  // shouldn't reach here
 }
 
+// This is a clever way to shave time from searching, and also
+// protect from accidentally leaving deuces open. A deuce can
+// be defined as two pieces in a row of the same color with a
+// position open where a third piece can be played for a win.
+// The point is to immediately take a win if there is a deuce
+// for "me" and immediately block a win if there is a deuce
+// for "you".
 int Board::findDeuce(char player)
 {
     int i, a;
