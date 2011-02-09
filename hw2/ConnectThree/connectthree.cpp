@@ -67,6 +67,7 @@ ConnectThree::ConnectThree(QWidget *parent) :
     setWindowTitle(tr("Connect Three"));
     gameboard = new Board(10);
     enemyTurn();   // start the game with the enemy's turn
+    //testBoard(); // for doing some individual game state tests
 }
 
 ConnectThree::~ConnectThree()
@@ -117,21 +118,29 @@ void ConnectThree::printArray(Board & board)
 void ConnectThree::enemyTurn()
 {
     int which_slot = 0;      // we'll store the return value here
-    int i;               // iterate the columns
-    int best_move = -9000;
-    // get minimax value for each possible move.
-    for(i = 1; i < 4; i++) {
-        // only try on columns that are available
-        if (!(gameboard->isColFull(i))) {
-            // have to insert into the temp board before minimaxing
-            Board new_board(*gameboard);     // temporary board to evaluate
-            new_board.insert(i,'R');
-            // now start trying to add enemy pieces and go from there...
-            int score = tryBlack(new_board, 10);
-            if (score > best_move) {
-                // get the best result, store it..
-                best_move = score;
-                which_slot = i;
+    int d1 = gameboard->findDeuce('R'); // see if we can get immediate win
+    int d2 = gameboard->findDeuce('B'); // see if we can block immediate win
+    if (d1 != -1)
+        which_slot = d1;  // crush them!
+    else if (d2 != -1)
+        which_slot = d2;  // defer!
+    else {
+        int i;               // iterate the columns
+        int best_move = -9000;
+        // get minimax value for each possible move.
+        for(i = 1; i < 4; i++) {
+            // only try on columns that are available
+            if (!(gameboard->isColFull(i))) {
+                // have to insert into the temp board before minimaxing
+                Board new_board(*gameboard);     // temporary board to evaluate
+                new_board.insert(i,'R');
+                // now start trying to add enemy pieces and go from there...
+                int score = tryBlack(new_board, 10);
+                if (score > best_move) {
+                    // get the best result, store it..
+                    best_move = score;
+                    which_slot = i;
+                }
             }
         }
     }
@@ -167,8 +176,9 @@ int ConnectThree::tryRed(Board & board, int depth)
 int ConnectThree::tryBlack(Board & board, int depth)
 {
     int status = board.eval('R');
-    if ((status != 0) || (depth == 0))
+    if ((status != 0) || (depth == 0)) {
         return status;
+    }
     int returnval = 9000;
     int i;
     for(i = 1; i < 4; i++) {
@@ -267,4 +277,37 @@ int ConnectThree::proofTakeTurn(Board & board, char player)
         }
     }
     return which_col;
+}
+
+void ConnectThree::testBoard()
+{
+    Board test(10);
+    test.insert(1,'R');
+    test.insert(1,'R');
+    test.insert(1,'B');
+    test.insert(1,'R');
+    test.insert(1,'R');
+    test.insert(1,'B');
+    test.insert(1,'R');
+    test.insert(1,'R');
+    test.insert(1,'B');
+    test.insert(1,'R');
+
+    test.insert(3,'B');
+    test.insert(3,'B');
+    test.insert(3,'R');
+    test.insert(3,'B');
+    test.insert(3,'B');
+    Board testone(test);
+    testone.insert(1, 'B');
+    int one = tryRed(testone, 10);
+    qDebug() << "Column 1: " << one;
+    Board testtwo(test);
+    testtwo.insert(2, 'B');
+    int two = tryRed(testtwo, 10);
+    qDebug() << "Column 2: " << two;
+    Board testthree(test);
+    testthree.insert(3, 'B');
+    int three = tryRed(testthree, 10);
+    qDebug() << "Column 3: " << three;
 }

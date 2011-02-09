@@ -32,6 +32,7 @@ public:
     ~ConnectThree();
     void proof();
     int proofTakeTurn(Board &, char);
+    void testBoard();
 
 private:
     void enemyTurn();

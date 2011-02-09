@@ -9,7 +9,6 @@ QT       += core gui
 TARGET = ConnectThree
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         connectthree.cpp \
     slotbutton.cpp \

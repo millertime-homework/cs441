@@ -23,6 +23,7 @@ public:
     string toString();
     bool isFull();
     bool isColFull(int);
+    int findDeuce(char);
 
 private:
     int nextSlot(int);
@@ -30,6 +31,10 @@ private:
     char matchDiagDown(int);
     char matchDiagUp(int);
     char matchUpDown(int);
+    int deuceAcross(char,int);
+    int deuceUpDown(char,int);
+    int deuceDiagUp(char,int);
+    int deuceDiagDown(char,int);
     int height;
     char * column1;
     char * column2;

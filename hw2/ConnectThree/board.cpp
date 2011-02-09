@@ -243,3 +243,115 @@ int Board::nextSlot(int col)
     }
     return 0;  // shouldn't reach here
 }
+
+int Board::findDeuce(char player)
+{
+    int i, a;
+    for(i = 0; i < height; i++) {
+        a = deuceAcross(player, i);
+        if (a != -1)
+            return a;
+        a = deuceDiagUp(player, i);
+        if (a != -1)
+            return a;
+        a = deuceDiagDown(player, i);
+        if (a != -1)
+            return a;
+        a = deuceUpDown(player, i);
+        if (a != -1)
+            return a;
+    }
+    return -1;
+}
+
+
+// X X -   or   - X X
+int Board::deuceAcross(char player, int row)
+{
+    // right side
+    if ((column2[row] == player) &&
+        (column1[row] == player) &&
+        (column3[row] == '-'))
+        return 3;
+    // left side
+    if ((column1[row] == '-') &&
+        (column3[row] == player) &&
+        (column2[row] == player))
+        return 1;
+    return -1;
+}
+
+//   X      X
+//  X   or   X
+// -          -
+int Board::deuceDiagDown(char player, int row)
+{
+    if (row > (height-3))
+        return -1;
+    // right side
+    if ((column2[row+1] == player) &&
+        (column1[row+2] == player) &&
+        (column3[row] == '-')) {
+        if (row == 0)
+            return 3;
+        else if (column3[row-1] != '-')
+            return 3;
+    }
+    // left side
+    if ((column1[row] == '-') &&
+        (column3[row+2] == player) &&
+        (column2[row+1] == player)) {
+        if (row == 0)
+            return 1;
+        else if (column1[row-1] != '-')
+            return 1;
+    }
+    return -1;
+}
+
+//   -      -
+//  X   or   X
+// X          X
+int Board::deuceDiagUp(char player, int row)
+{
+    if (row > (height-3))
+        return -1;
+    // right side
+    if ((column1[row] == player) &&
+        (column2[row+1] == player) &&
+        (column3[row+2] == '-') &&
+        (column3[row+1] != '-'))
+            return 3;
+    // left side
+    if ((column1[row+2] == '-') &&
+        (column3[row] == player) &&
+        (column2[row+1] == player) &&
+        (column1[row+1] != '-'))
+            return 1;
+    return -1;
+}
+
+// -
+// X
+// X
+int Board::deuceUpDown(char player, int row)
+{
+    if (row > (height-3))
+        return -1;
+    // first column
+    if ((column1[row] == player) &&
+        (column1[row+1] == player) &&
+        (column1[row+2] == '-'))
+        return 1;
+    // second column
+    if ((column2[row] == player) &&
+        (column2[row+1] == player) &&
+        (column2[row+2] == '-'))
+        return 2;
+    // third column
+    if ((column3[row] == player) &&
+        (column3[row+1] == player) &&
+        (column3[row+2] == '-'))
+        return 3;
+    return -1;
+}
