@@ -1,0 +1,17 @@
+Simple Circuit
+
+Goal: to prevent wires from crossing on a simple circuit.
+
+To run the script:
+
+For the 3 input files...
+python hw3.py filename path/to/picosat
+
+The last argument for the program is a full path to the picosat program.
+You will need to make sure picosat is installed on your system. If picosat
+is in your PATH, you may simply use "picosat" as the last argument.
+
+This will produce soln-#.txt. You can check that the solution is correct
+with wiring-check.hs.
+
+runghc wiring-check.hs inst-#.txt soln-#.txt
