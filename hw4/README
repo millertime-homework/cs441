@@ -1,0 +1,23 @@
+CS441 Homework 4
+nbayes -- Naïve Bayesian machine learner to diagnose heart anomalies
+
+see nbayes.pdf for problem description...
+Props to Bart Bassey for writing up this very detailed assignment!
+
+Author: Russell Miller
+
+-----------------------
+WRITEUP
+-----------------------
+
+Starting out, I saw all of the math in the description for this
+assignment and got very very scared. But after realizing we've 
+already done an example of this in class, I suddenly understood
+exactly what I needed to do. There are several data files, and in
+each one I grab the first number, it is the class of that instance
+of data. In our in-class example this was "What programming language 
+would you prefer that I use to show an example in class?" Then every
+other value is a binary yes/no for each feature. In class our features
+were "Have you been coding for more than 5 years?" and "Do you have
+20/20 vision?" So far all I've gotten working is reading the data
+files and counting who is in what class.
