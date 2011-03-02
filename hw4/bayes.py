@@ -32,13 +32,19 @@ class NBayes:
     def __init__(self, d):
         self.nfeatures = len(d[0]) - 1
         self.ninstances = len(d)
+        # initialize table of features
+        self.features = [[],[]]
+        for f in range(self.nfeatures):
+            self.features[0].append(0)
+        for f in range(self.nfeatures):
+            self.features[1].append(0)
         self.data = d
         self.learn()
     
     def learn(self):
         """Scan the data and train yer brain on it"""
-        print("Number of instances: %d" % self.ninstances)
-        print("Number of features: %d" % self.nfeatures)
+        #print("Number of instances: %d" % self.ninstances)
+        #print("Number of features: %d" % self.nfeatures)
         class_0 = 0
         class_1 = 0
         for instance in self.data:
@@ -51,7 +57,17 @@ class NBayes:
                 #ohshit
                 print("Unexpected class %d found!" % c)
                 exit()
-        # print("Class 0: %d Class 1: %d" % (class_0,class_1))
+            i = 0
+            for f in instance[1:]:
+                if f == 1:
+                    self.features[c][i] += 1
+                i += 1
+        print("Class 0: %d Class 1: %d" % (class_0,class_1))
+        i = 0
+        for c in self.features:
+            print("Class %d:" % i)
+            print(c)
+            i += 1
 
 if __name__=="__main__":
     main()
