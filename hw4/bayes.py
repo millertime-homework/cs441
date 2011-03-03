@@ -34,7 +34,10 @@ def main():
             test_set.append(map(int, line[:-1].split(',')))
         f.close()
         a,b,t,n,m = nbayes.test(test_set)
-        print("%s %d/%d %d/%d %d/%d" % (shorthands[i],a+b,t,a,n,b,m))
+        x = round(float(a+b)/float(t),2)    # accuracy
+        y = round(float(a)/float(n),2)      # 1-accuracy
+        z = round(float(b)/float(m),2)      # 0-accuracy
+        print("%s %d/%d(%.2f) %d/%d(%.2f) %d/%d(%.2f)" % (shorthands[i],a+b,t,x,b,m,z,a,n,y))
 
 class NBayes:
     """ADT to hold the learner data"""
