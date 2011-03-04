@@ -82,6 +82,8 @@ class NBayes:
         correct_zeros = 0
         ones = 0
         zeros = 0
+        # debug info
+        # diffs = []
         for instance in test_instances:
             c = instance[0]
             L = []
@@ -94,10 +96,10 @@ class NBayes:
             for i in range(2):
                 for j in range(self.nfeatures):
                     if instance[j] == 1:
-                        L[i] += math.log(self.features[i][instance[j]] + .5)
+                        L[i] += math.log(self.features[i][j] + .5)
                         L[i] -= math.log(self.nclass[i] + .5)
                     elif instance[j] == 0:
-                        L[i] += math.log(self.nclass[i] - self.features[i][instance[j]] + .5)
+                        L[i] += math.log(self.nclass[i] - self.features[i][j] + .5)
                         L[i] -= math.log(self.nclass[i] + .5)
                     else:
                         print("Non-binary feature value in test")
@@ -113,6 +115,14 @@ class NBayes:
             else:
                 print("Non-binary class value in test")
                 exit()
+            # debug info
+            # diffs.append(L[1] - L[0])
+        # debug info
+        # smalldiffs = []
+        # for d in diffs:
+            # if (d < 0 and d > -.1) or (d > 0 and d < .1):
+                # smalldiffs.append(d)
+        # print(smalldiffs)
         return correct_ones,correct_zeros,ntests,ones,zeros
 
 if __name__=="__main__":
