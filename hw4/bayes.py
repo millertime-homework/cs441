@@ -66,7 +66,7 @@ class NBayes:
             try:
                 self.nclass[c] += 1
             except IndexError:
-                print "Non-binary class value"
+                print("Non-binary class value")
                 exit()
             i = 0
             for f in instance[1:]:
