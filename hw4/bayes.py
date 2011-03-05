@@ -47,9 +47,8 @@ class NBayes:
         # initialize table of features
         self.features = [[],[]]
         for f in range(self.nfeatures):
-            self.features[0].append(0)
-        for f in range(self.nfeatures):
-            self.features[1].append(0)
+            for i in range(2):
+                self.features[i].append(0)
         # initialize class counters
         self.nclass = []
         self.nclass.append(0)
@@ -94,12 +93,14 @@ class NBayes:
                 L[i] = math.log(self.nclass[i] + .5) 
                 L[i] -= math.log(self.nclass[1] + self.nclass[0] + .5)
             for i in range(2):
-                for j in range(self.nfeatures):
+                assert(len(instance[1:]) == self.nfeatures)
+                assert(len(self.features[i]) == self.nfeatures)
+                for j in range(1, self.nfeatures):
                     if instance[j] == 1:
-                        L[i] += math.log(self.features[i][j] + .5)
+                        L[i] += math.log(self.features[i][j-1] + .5)
                         L[i] -= math.log(self.nclass[i] + .5)
                     elif instance[j] == 0:
-                        L[i] += math.log(self.nclass[i] - self.features[i][j] + .5)
+                        L[i] += math.log(self.nclass[i] - self.features[i][j-1] + .5)
                         L[i] -= math.log(self.nclass[i] + .5)
                     else:
                         print("Non-binary feature value in test")
