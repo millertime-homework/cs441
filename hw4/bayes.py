@@ -90,10 +90,7 @@ class NBayes:
                 # likelihook of just the class
                 L[i] = math.log(self.nclass[i] + .5) 
                 L[i] -= math.log(self.nclass[1] + self.nclass[0] + .5)
-            for i in range(2):
-                assert(len(instance[1:]) == self.nfeatures)
-                assert(len(self.features[i]) == self.nfeatures)
-                for j in range(1, self.nfeatures):
+                for j in range(1, self.nfeatures+1):
                     s = self.features[i][j-1]
                     if instance[j] == 0:
                         s = self.nclass[i] - s
