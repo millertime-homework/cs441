@@ -86,8 +86,8 @@ class NBayes:
         for instance in test_instances:
             c = instance[0]
             L = []
-            L.append(0)
-            L.append(0)
+            L.append(0.0)
+            L.append(0.0)
             for i in range(2):
                 # likelihook of just the class
                 L[i] = math.log(self.nclass[i] + .5) 
@@ -96,22 +96,17 @@ class NBayes:
                 assert(len(instance[1:]) == self.nfeatures)
                 assert(len(self.features[i]) == self.nfeatures)
                 for j in range(1, self.nfeatures):
-                    if instance[j] == 1:
-                        L[i] += math.log(self.features[i][j-1] + .5)
-                        L[i] -= math.log(self.nclass[i] + .5)
-                    elif instance[j] == 0:
-                        L[i] += math.log(self.nclass[i] - self.features[i][j-1] + .5)
-                        L[i] -= math.log(self.nclass[i] + .5)
-                    else:
-                        print("Non-binary feature value in test")
-                        exit()
+                    s = self.features[i][j-1]
+                    if instance[j] == 0:
+                        s = self.nclass[i] - s
+                    L[i] += math.log(s + .5) - math.log(self.nclass[i] + .5)
             if c == 1:
                 ones += 1
-                if L[1] > L[0]:
+                if L[1] >= L[0]:
                     correct_ones += 1
             elif c == 0:
                 zeros += 1
-                if L[1] <= L[0]:
+                if L[0] >= L[1]:
                     correct_zeros += 1
             else:
                 print("Non-binary class value in test")
